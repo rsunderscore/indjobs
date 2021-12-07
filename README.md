@@ -49,3 +49,9 @@ Algorithm options:
 - Soft set-based classifier
 - Multiple-instance learning
 - Natural language processing approaches
+
+more algorithms from [sklearn site](https://scikit-learn.org/stable/modules/clustering.html#)
+- Spectral
+- DBSCAN
+- 
+
