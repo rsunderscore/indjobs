@@ -1,4 +1,6 @@
 #place to put utility functions
+import pandas as pd
+import numpy as np
 
 def get_confusion(CF, i):
     """
@@ -25,7 +27,58 @@ def get_confusion(CF, i):
     res = pd.Series([TP, FP, FN, TN, accuracy, precision, recall, f1 ], index=cols)
     return res
 
-#get_confusion(CF, 0)
+def eudist(p1, p2):
+    #sqrt of (x2-x1)**2 + (y2-y1)**2
+    return np.sqrt((p2[0]-p1[0])**2+(p2[1]-p1[1])**2)
+
+def npdist(p1, p2):
+    """calculate distance using numpy.linalg.norm
+     Euclidean distance is equivalent to the l2 norm of the difference between the two points
+     i.e. np.linalg.norm(np.array((10,0))-np.array((1,0)),2) == 9
+    """
+    return np.linalg.norm(p2-p1, 2)
+
+def test_eudist():
+    
+    p1 = (0, 0)
+    p2 = (0, 0)
+    assert eudist(p1,p2) == 0
+    
+    p2 = (10,0)
+    assert eudist(p1,p2) == 10
+    
+    p2 = (0, 10)
+    assert eudist(p1,p2) ==10
+    
+    p2 = (4, 3)
+    assert eudist(p1,p2) ==5
+
+def inersha(pts, ctrs): 
+    """ 
+    sum of squared distances of points from their nearest centroid
+    given points and centroids - compute the inertia (how close each point is to nearest centrooid)
+    return the sum
+    """
+    res = []
+    for pt in pts:
+        #compute distances from this point to each center an keep the minimum one
+        print(f"for point {pt}", end="---")
+        mindist = np.inf
+        for c in ctrs:
+            #commpute distance
+            dist = eudist(pt, c)
+            if dist < mindist: 
+                msg = f"{c} is closest with dist {dist:.2f}"
+                mindist = dist
+        print(msg)
+        res.append(mindist**2)
+    return sum(res)
+
+def test_inersha():
+    pts = [(0,10),(5,5),(4,3),(1,1),(3,4), (8, 5), (0, 1), (5, 1), (5, 9), (0, 8), (1, 5), (1, 8), (1, 3), (2, 6), (6, 2), [1, 2], [8, 2], [4, 0], [6, 2], [4, 9], [8, 6], [9, 2], [3, 2], [7, 5], [6, 5]]
+    ctrs = [(0,0), (0,10), (7,7)]
+    inersha(pts, ctrs) == 330
+    
 def get_all_confusion(CF, target_names):
     allgroups = pd.Series(CF.index).apply(lambda x: get_confusion(CF, x))
     avgofrows = allgroups.mean()
@@ -58,3 +111,6 @@ def get_newsgroup_data(uselocalcopy = True, remove = ('headers', 'footers', 'quo
             datastore['data_train'] = data_train
             datastore['data_test'] = data_test
     return data_train, data_test
+
+def size_mb(docs):
+    return sum(len(s.encode("utf-8")) for s in docs) / 1e6
