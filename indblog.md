@@ -58,7 +58,7 @@ def clean_soup(soup_or_html, rem_tags = ['meta', 'script', 'style', 'svg', 'butt
 
 I was able to locate the urls for the iframe in script tags contained in each jobCard. Each link could be extracted with a regular expression, `(?:\")[\w/]*?viewjob\?[\w=&]+(?P<jk>jk=\w+)[\w=&-]+.{1,3}`.  I wrote functions to extract all of the matching links and download their contents.  The html returned for each job was parsed for the classes that appeared to contain the details we needed.  This functionality was put into a python file that could be loaded to jupyter notebooks as a module.  I started to put the functionality into a class named `indweb` to encapsulate the scraping component but this is not yet complete.
 
-```
+```python
 class indweb():
     from urllib.parse import quote, unquote
     import re
@@ -126,7 +126,7 @@ The key fields we would use were within the html for the job details of each lin
 
 I had some initial concern about dynamic rendering of the content resulting in data gaps, but other than the map field (which contained an address that was also typically available in the CompanyInfo) I did not have any problems.
 
-I felt obligated to make a copy of the original soup object so that modification of the original object would be explicit, if desired. (zen of python rule #2)
+
 Search results were contained in individual table elements with a class string that contained 'JobCard'. Unfortunately there were two variants of this class label, one with 'ShelfContainer' and another with '_mainContent'; so a simple find_all would not be able to locate all of the relevant tables. _mainContent tables contained information about the employer and ShelfContainer tables contained the actual job details. 
 I found it convenient to view tag attributes from find_all by passing them to a pandas DataFrame, to automatically handle any tags that were inconsistent (or missing) between the resulting tag elements.
 `pd.DataFrame([x.attrs for x  in s2.find('body').find_all('table')])`
